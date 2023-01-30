@@ -11,11 +11,14 @@ public class MainManager : MonoBehaviour
     public Rigidbody Ball;
 
     public Text ScoreText;
+    public Text highScoreText;
     public GameObject GameOverText;
+    public Text playerName;
     
     private bool m_Started = false;
     private int m_Points;
-    
+    public int highScore = 0;
+
     private bool m_GameOver = false;
 
     
@@ -34,8 +37,14 @@ public class MainManager : MonoBehaviour
                 var brick = Instantiate(BrickPrefab, position, Quaternion.identity);
                 brick.PointValue = pointCountArray[i];
                 brick.onDestroyed.AddListener(AddPoint);
+                
             }
         }
+    }
+    private void Awake()
+    {
+        playerName.text = PlayerDataHandler.instance.playerName;
+        AddPoint(0);
     }
 
     private void Update()
@@ -61,11 +70,22 @@ public class MainManager : MonoBehaviour
             }
         }
     }
-
     void AddPoint(int point)
     {
+
+        highScore = PlayerPrefs.GetInt("HighScore");
         m_Points += point;
         ScoreText.text = $"Score : {m_Points}";
+        if (highScore < m_Points)
+        {
+            highScore = m_Points;
+            PlayerPrefs.SetInt("HighScore", highScore);
+            highScoreText.text = "HighScore: " + highScore;
+        }
+        else
+        {
+            highScoreText.text = "HighScore: " + highScore;
+        }
     }
 
     public void GameOver()
